@@ -21,7 +21,7 @@ RUN rpm-ostree install \
     kvantum \
     cloudflare-warp \
     qbittorrent \
-    onlyoffice-desktopeditors
+    
 
 # 5. NATIVE ZEN BROWSER (The "Manual Native" Way)
 # We download the engine and link it to your system so 'zen-browser' works in terminal.
