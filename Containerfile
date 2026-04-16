@@ -4,11 +4,10 @@ FROM ghcr.io/ublue-os/bazzite-nvidia:latest
 # 1. Add Cloudflare WARP Repository
 RUN curl -Lo /etc/yum.repos.d/cloudflare-warp.repo https://pkg.cloudflareclient.com/cloudflare-warp-ascii.repo
 
-# 2. Rip out the Steam/Lutris Bloatware
+# 2. Rip out the Steam/Lutris/Waydroid (Sunshine is already gone)
 RUN rpm-ostree override remove \
     steam \
     lutris \
-    sunshine \
     waydroid
 
 # 3. Layer the core system tools (baked into the OS)
@@ -17,7 +16,7 @@ RUN rpm-ostree install \
     kvantum \
     cloudflare-warp
 
-# 4. Install your optimized Flatpaks (Apps that stay updated easily)
+# 4. Install your optimized Flatpaks
 RUN flatpak install --system -y flathub \
     org.qbittorrent.qBittorrent \
     org.onlyoffice.desktopeditors \
