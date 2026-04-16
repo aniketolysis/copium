@@ -1,19 +1,21 @@
-# 1. THE BASE (Fedora 43 / Bazzite 2026)
+# 1. THE BASE (Bazzite Nvidia)
 FROM ghcr.io/ublue-os/bazzite-nvidia:latest
 
-# 2. ADD REPOS (Cloudflare & OnlyOffice)
+# 2. ADD NATIVE REPOS
+# We write the OnlyOffice repo manually to avoid "dead link" errors.
 RUN curl -Lo /etc/yum.repos.d/cloudflare-warp.repo https://pkg.cloudflareclient.com/cloudflare-warp-ascii.repo && \
-    curl -Lo /etc/yum.repos.d/onlyoffice.repo https://download.onlyoffice.com/repo/fedora/main/noarch/onlyoffice.repo
+    printf "[onlyoffice]\nname=onlyoffice\nbaseurl=https://download.onlyoffice.com/repo/centos/main/noarch/\ngpgcheck=1\nenabled=1\ngpgkey=https://download.onlyoffice.com/repo/centos/main/noarch/onlyoffice.pub" > /etc/yum.repos.d/onlyoffice.repo
 
-# 3. THE DEBLOAT (The Fix: Added waydroid-selinux)
-# This removes Steam, Lutris, and the entire Waydroid stack.
+# 3. THE DEBLOAT (The Clean Sweep)
+# Removing Steam, Lutris, and the entire Waydroid stack together.
 RUN rpm-ostree override remove \
     steam \
     lutris \
     waydroid \
     waydroid-selinux
 
-# 4. NATIVE INSTALL (Baked directly into the OS layer)
+# 4. NATIVE INSTALL (Baked directly into the OS)
+# These will be real, native RPM packages. No sandboxes.
 RUN rpm-ostree install \
     alacritty \
     kvantum \
@@ -21,10 +23,10 @@ RUN rpm-ostree install \
     qbittorrent \
     onlyoffice-desktopeditors
 
-# 5. NATIVE ZEN BROWSER (Manual Install to /opt)
-# We download the latest tarball, unpack it to /opt, and link it to your system path.
+# 5. NATIVE ZEN BROWSER (The "Manual Native" Way)
+# We download the engine and link it to your system so 'zen-browser' works in terminal.
 RUN curl -L https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.bz2 | tar -xj -C /opt/ && \
     ln -s /opt/zen/zen /usr/bin/zen-browser
 
-# 6. SECURITY: Tells the OS to trust your local image
+# 6. SECURITY: Trust your signature
 COPY cosign.pub /etc/pki/containers/aniketian.pub
